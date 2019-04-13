@@ -2659,7 +2659,7 @@ int _tmain(int argc, _TCHAR* argv[])
 						}
 					}
 					else if (str == "/help"){
-						GamePacket p = packetEnd(appendString(appendString(createPacket(), "OnConsoleMessage"), "Supported commands are: /mods, /ducttape, /help, /mod, /unmod, /inventory, /item id, /team id, /color number, /who, /state number, /count, /sb message, /alt, /radio, /gem, /jsb, /find itemname, /unequip, /weather id"));
+						GamePacket p = packetEnd(appendString(appendString(createPacket(), "OnConsoleMessage"), "Supported commands are: /mods, /ducttape, /help, /mod, /unmod, /inventory, /item id, /team id, /color number, /who, /state number, /count, /sb message, /alt, /radio, /gem, /jsb, /find itemname, /unequip, /weather id, /wizard"));
 						ENetPacket * packet = enet_packet_create(p.data,
 							p.len,
 							ENET_PACKET_FLAG_RELIABLE);
@@ -2680,6 +2680,35 @@ int _tmain(int argc, _TCHAR* argv[])
 
 
 						}
+					else if (str == "/wizard")
+						{
+
+							((PlayerInfo*)(peer->data))->cloth_back = 0;
+							sendState(peer);
+							((PlayerInfo*)(peer->data))->cloth_face = 1790;
+							sendState(peer);
+							((PlayerInfo*)(peer->data))->cloth_feet = 0;
+							sendState(peer);
+							((PlayerInfo*)(peer->data))->cloth_hair = 0;
+							sendState(peer);
+							((PlayerInfo*)(peer->data))->cloth_hand = 0;
+							sendState(peer);
+							((PlayerInfo*)(peer->data))->cloth_mask = 0;
+							sendState(peer);
+							((PlayerInfo*)(peer->data))->cloth_necklace = 0;
+							sendState(peer);
+							((PlayerInfo*)(peer->data))->cloth_pants = 0;
+							sendState(peer);
+							((PlayerInfo*)(peer->data))->cloth_shirt = 0;
+							sendState(peer);
+							((PlayerInfo*)(peer->data))->skinColor = 2;
+							sendClothes(peer);
+							GamePacket p = packetEnd(appendString(appendString(createPacket(), "OnConsoleMessage"), "`^Legendary Wizard Set Mod has been Enabled! "));
+							ENetPacket* packet = enet_packet_create(p.data,
+								p.len,
+								ENET_PACKET_FLAG_RELIABLE);
+							enet_peer_send(peer, 0, packet);
+							delete p.data;
 					else if (str.substr(0, 9) == "/weather ") {
 							if (world->name != "ADMIN") {
 								if (world->owner != "") {
