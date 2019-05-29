@@ -19,3 +19,40 @@ This project has been published under GNU AFFERO GPL license, so you need to **p
 If you want to support development of this server, then make sure you contribute to this repo!
 
 Make that sure that you subscribe my channel https://www.youtube.com/channel/UCLXtuoBlrXFDRtFU8vPy35g and enjoy :+1:
+
+# Issue Template
+
+Issue tracker is **ONLY** used for reporting bugs.
+
+<!--- Provide a general summary of the issue in the Title above -->
+
+## Expected Behavior
+<!--- Tell us what should happen -->
+
+## Current Behavior
+<!--- Tell us what happens instead of the expected behavior -->
+
+## Possible Solution
+<!--- Not obligatory, but suggest a fix/reason for the bug, -->
+
+## Steps to Reproduce
+<!--- Provide a link to a live example, or an unambiguous set of steps to -->
+<!--- reproduce this bug. Include code to reproduce, if relevant -->
+1.
+1.
+1.
+1.
+
+## Context (Environment)
+<!--- How has this issue affected you? What are you trying to accomplish? -->
+<!--- Providing context helps us come up with a solution that is most useful in the real world -->
+
+<!--- Provide a general summary of the issue in the Title above -->
+
+## Detailed Description
+<!--- Provide a detailed description of the change or addition you are proposing -->
+
+## Possible Implementation
+<!--- Not obligatory, but suggest an idea for implementing addition or change -->
+
+
