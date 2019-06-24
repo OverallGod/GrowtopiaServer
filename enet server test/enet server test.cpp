@@ -678,6 +678,16 @@ int PlayerDB::playerRegister(string username, string password, string passwordve
 	j["email"] = email;
 	j["discord"] = discord;
 	j["adminLevel"] = 0;
+	j["ClothBack"] = 0;
+	j["ClothHand"] = 0;
+	j["ClothFace"] = 0;
+	j["ClothShirt"] = 0;
+	j["ClothPants"] = 0;
+	j["ClothNeck"] = 0;
+	j["ClothHair"] = 0;
+	j["ClothFeet"] = 0;
+	j["ClothMask"] = 0;
+	j["ClothAnces"] = 0;
 	o << j << std::endl;
 	return 1;
 }
@@ -1378,30 +1388,56 @@ void SendPacketRaw(int a1, void *packetData, size_t packetDataSize, void *a4, EN
 			}
 
 		}
+
+		if (((PlayerInfo*)(peer->data))->haveGrowId) {
+
+			PlayerInfo* p = ((PlayerInfo*)(peer->data));
+			
+			string username = PlayerDB::getProperName(p->rawName);
+
+			std::ifstream od("players/" + username + ".json");
+			if (od.is_open()) {
+			}
+
+			std::ofstream o("players/" + username + ".json");
+			if (!o.is_open()) {
+				cout << GetLastError() << endl;
+				_getch();
+			}
+			json j;
+
+			int clothback = p->cloth_back;
+			int clothhand = p->cloth_hand;
+			int clothface = p->cloth_face;
+			int clothhair = p->cloth_hair;
+			int clothfeet = p->cloth_feet;
+			int clothpants = p->cloth_pants;
+			int clothneck = p->cloth_necklace;
+			int clothshirt = p->cloth_shirt;
+			int clothmask = p->cloth_mask;
+			int clothances;
+			string password = ((PlayerInfo*)(peer->data))->tankIDPass;
+			j["username"] = username;
+			j["password"] = hashPassword(password);
+			j["email"] = email;
+			j["discord"] = discord;
+			j["ClothBack"] = clothback;
+			j["ClothHand"] = clothhand;
+			j["ClothFace"] = clothface;
+			j["ClothShirt"] = clothshirt;
+			j["ClothPants"] = clothpants;
+			j["ClothNeck"] = clothneck;
+			j["ClothHair"] = clothhair;
+			j["ClothFeet"] = clothfeet;
+			j["ClothMask"] = clothmask;
+			j["ClothAnces"] = clothances;
+
+
+			o << j << std::endl;
+		}
+
 		//enet_host_flush(server);
 		delete p3.data;
-	}
-
-	void sendPData(ENetPeer* peer, PlayerMoving* data)
-	{
-		ENetPeer * currentPeer;
-
-		for (currentPeer = server->peers;
-			currentPeer < &server->peers[server->peerCount];
-			++currentPeer)
-		{
-			if (currentPeer->state != ENET_PEER_STATE_CONNECTED)
-				continue;
-			if (peer != currentPeer)
-			{
-				if (isHere(peer, currentPeer))
-				{
-					data->netID = ((PlayerInfo*)(peer->data))->netID;
-
-					SendPacketRaw(4, packPlayerMoving(data), 56, 0, currentPeer, ENET_PACKET_FLAG_RELIABLE);
-				}
-			}
-		}
 	}
 
 	int getPlayersCountInWorld(string name)
@@ -1900,10 +1936,46 @@ void SendPacketRaw(int a1, void *packetData, size_t packetDataSize, void *a4, EN
 			}
 		}
 		((PlayerInfo*)(peer->data))->currentWorld = worldInfo->name;
+
+		if (((PlayerInfo*)(peer->data))->haveGrowId) {
+
+			PlayerInfo* p = ((PlayerInfo*)(peer->data));
+			std::ifstream ifff("players/" + PlayerDB::getProperName(p->rawName) + ".json");
+			json j;
+			ifff >> j;
+
+			p->currentWorld = worldInfo->name;
+
+			int bac, han, fac, hai, fee, pan, nec, shi, mas;
+			bac = j["ClothBack"];
+			han = j["ClothHand"];
+			fac = j["ClothFace"];
+			hai = j["ClothHair"];
+			fee = j["ClothFeet"];
+			pan = j["ClothPants"];
+			nec = j["ClothNeck"];
+			shi = j["ClothShirt"];
+			mas = j["ClothMask"];
+
+			p->cloth_back = bac;
+			p->cloth_hand = han;
+			p->cloth_face = fac;
+			p->cloth_hair = hai;
+			p->cloth_feet = fee;
+			p->cloth_pants = pan;
+			p->cloth_necklace = nec;
+			p->cloth_shirt = shi;
+			p->cloth_mask = mas;
+
+			sendClothes(peer);
+
+			ifff.close();
+
+		}
+
 		delete data;
 
 	}
-
 	void sendAction(ENetPeer* peer, int netID, string action)
 	{
 		ENetPeer * currentPeer;
