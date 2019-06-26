@@ -2385,30 +2385,109 @@ int _tmain(int argc, _TCHAR* argv[])
 				if (cch.find("action|dialog_return") == 0)
 				{
 					std::stringstream ss(cch);
-					std::string to;
-					string btn = "";
-					bool isRegisterDialog = false;
-					string username = "";
-					string password = "";
-					string passwordverify = "";
-					string email = "";
-					string discord = "";
-					while (std::getline(ss, to, '\n')) {
-						vector<string> infoDat = explode("|", to);
-						if (infoDat.size() == 2) {
-							if (infoDat[0] == "buttonClicked") btn = infoDat[1];
-							if (infoDat[0] == "dialog_name" && infoDat[1] == "register")
-							{
-								isRegisterDialog = true;
-							}
-							if (isRegisterDialog) {
-								if (infoDat[0] == "username") username = infoDat[1];
-								if (infoDat[0] == "password") password = infoDat[1];
-								if (infoDat[0] == "passwordverify") passwordverify = infoDat[1];
-								if (infoDat[0] == "email") email = infoDat[1];
-								if (infoDat[0] == "discord") discord = infoDat[1];
-							}
-						}
+std::string to;
+string btn = "";
+bool isRegisterDialog = false;
+bool ItemDialog = false;
+string itemname = "";
+string username = "";
+string password = "";
+string passwordverify = "";
+string email = "";
+string discord = "";
+while (std::getline(ss, to, '\n')) {
+    vector < string > infoDat = explode("|", to);
+    if (infoDat.size() == 2) {
+        if (infoDat[0] == "buttonClicked") btn = infoDat[1];
+        if (infoDat[0] == "dialog_name" && infoDat[1] == "register") {
+            isRegisterDialog = true;
+        }
+        if (infoDat[0] == "dialog_name" && infoDat[1] == "finditem") {
+            ItemDialog = true;
+        }
+
+        if (ItemDialog) {
+            if (infoDat[0] == "itemname") itemname = infoDat[1];
+        }
+
+        if (isRegisterDialog) {
+            if (infoDat[0] == "username") username = infoDat[1];
+            if (infoDat[0] == "password") password = infoDat[1];
+            if (infoDat[0] == "passwordverify") passwordverify = infoDat[1];
+            if (infoDat[0] == "email") email = infoDat[1];
+            if (infoDat[0] == "discord") discord = infoDat[1];
+        }
+        if (ItemDialog) {
+            string item = itemname;
+            if (item != "") {
+                if (item.length() >= 3) {
+                    string stuff;
+                    std::ifstream infile("CoreData.txt");
+                    for (std::string line; getline(infile, line);) {
+                        if (line.length() > 8 && line[0] != '/' && line[1] != '/') {
+                            vector < string > ex = explode("|", line);
+                            string nom = ex[1];
+                            string id = ex[0];
+                            std::transform(nom.begin(), nom.end(), nom.begin(), ::tolower);
+
+                            std::transform(item.begin(), item.end(), item.begin(), ::tolower);
+
+                            if (nom.find(item) != std::string::npos) {
+                                stuff.append("\nadd_button_with_icon|lolfind" + id + "|" + nom + "|left|" + id + "|");
+                            }
+                        }
+                    }
+                    string x = "set_default_color|`3\n";
+
+                    x.append("\nadd_label|big|`9Item Finder|left|");
+                    if (stuff == "") {
+                        GamePacket p = packetEnd(appendString(appendString(createPacket(), "OnConsoleMessage"), "`4[ Item Finding ] `o: No result for " + item + "!"));
+                        ENetPacket * packet = enet_packet_create(p.data,
+                            p.len,
+                            ENET_PACKET_FLAG_RELIABLE);
+                        enet_peer_send(peer, 0, packet);
+                        delete p.data;
+                    } else {
+                        x.append("\nadd_label|small|`wHere are the results of your `9search`w:|left|");
+
+                        x.append("\nadd_spacer|small|");
+
+                        x.append(stuff);
+
+                        //x.append(addspacer("big"));
+                    }
+                    x.append("\n\nadd_quick_exit|\nnend_dialog|gazette||OK|");
+
+                    GamePacket p = packetEnd(appendString(appendString(createPacket(), "OnDialogRequest"), x));
+                    ENetPacket * packet = enet_packet_create(p.data,
+                        p.len,
+                        ENET_PACKET_FLAG_RELIABLE);
+                    enet_peer_send(peer, 0, packet);
+                    delete p.data;
+                } else {
+                    GamePacket p = packetEnd(appendString(appendString(createPacket(), "OnConsoleMessage"), "`4You must enter 3 or more letters!"));
+                    ENetPacket * packet = enet_packet_create(p.data,
+                        p.len,
+                        ENET_PACKET_FLAG_RELIABLE);
+                    enet_peer_send(peer, 0, packet);
+                    delete p.data;
+                }
+            }
+        }
+    }
+}
+					if (btn.substr(0, 7) == "lolfind") {
+    					PlayerInventory inventory;
+    					InventoryItem item;
+    					item.itemID = atoi(btn.substr(7, btn.length()).c_str());
+    					item.itemCount = 200;
+    					inventory.items.push_back(item);
+    					item.itemCount = 1;
+    					item.itemID = 18;
+    					inventory.items.push_back(item);
+    					item.itemID = 32;
+    					inventory.items.push_back(item);
+    					sendInventory(peer, inventory);
 					}
 					if (btn == "worldPublic") if (((PlayerInfo*)(peer->data))->rawName == getPlyersWorld(peer)->owner) getPlyersWorld(peer)->isPublic = true;
 					if(btn == "worldPrivate") if (((PlayerInfo*)(peer->data))->rawName == getPlyersWorld(peer)->owner) getPlyersWorld(peer)->isPublic = false;
@@ -2542,35 +2621,22 @@ int _tmain(int argc, _TCHAR* argv[])
 						((PlayerInfo*)(peer->data))->cloth_necklace = 0;
 						sendClothes(peer);
 					}
-					else if (str.substr(0, 6) == "/find ")
-					{
-						ItemDefinition def;
-						bool found = false;
-						string itemname = str.substr(6, cch.length() - 6 - 1);
-						for (int o = 0; o < itemDefs.size(); o++)
-						{
-							def = getItemDef(o);
-							if (def.name == itemname)
-							{
-								GamePacket p344 = packetEnd(appendString(appendString(createPacket(), "OnConsoleMessage"), "`rItem ID of " + def.name + ": " + std::to_string(def.id)));
-								ENetPacket * packet344 = enet_packet_create(p344.data,
-									p344.len,
-									ENET_PACKET_FLAG_RELIABLE);
-								enet_peer_send(peer, 0, packet344);
-								delete p344.data;
-								found = true;
-							}
-						}
-						if (found == false)
-						{
-							GamePacket p3344 = packetEnd(appendString(appendString(createPacket(), "OnConsoleMessage"), "`4Could not find the following item. Please use uppercase at the beggining, ( for example: Legendary Wings, not legendary wings )."));
-							ENetPacket * packet3344 = enet_packet_create(p3344.data,
-								p3344.len,
-								ENET_PACKET_FLAG_RELIABLE);
-							enet_peer_send(peer, 0, packet3344);
-							delete p3344.data;
-						}
-						found = false;
+					else if (str == "/find") {
+  					string x = "set_default_color|`3\n";
+  					x.append("\nadd_label_with_icon|big|`7Find Items|left|1796|");
+					x.append("\nadd_label|small|`oYou can use this to find `7Items `wyou want!|left|");
+ 					x.append("\nadd_spacer|small|");
+  					x.append("\nadd_textbox|Enter an item that you want to find.|");
+  					x.append("\nadd_text_input|itemname|:||10|");
+  					x.append("\nend_dialog|finditem|Cancel|Find!|");
+  					x.append("\nadd_quick_exit|");
+
+  					GamePacket p = packetEnd(appendString(appendString(createPacket(), "OnDialogRequest"), x));
+  					ENetPacket * packet = enet_packet_create(p.data,
+   					p.len,
+   					ENET_PACKET_FLAG_RELIABLE);
+  					enet_peer_send(peer, 0, packet);
+ 					delete p.data;
 					}
 					else if (str == "/mods") {
 						string x;
