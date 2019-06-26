@@ -2385,109 +2385,109 @@ int _tmain(int argc, _TCHAR* argv[])
 				if (cch.find("action|dialog_return") == 0)
 				{
 					std::stringstream ss(cch);
-std::string to;
-string btn = "";
-bool isRegisterDialog = false;
-bool ItemDialog = false;
-string itemname = "";
-string username = "";
-string password = "";
-string passwordverify = "";
-string email = "";
-string discord = "";
-while (std::getline(ss, to, '\n')) {
-    vector < string > infoDat = explode("|", to);
-    if (infoDat.size() == 2) {
-        if (infoDat[0] == "buttonClicked") btn = infoDat[1];
-        if (infoDat[0] == "dialog_name" && infoDat[1] == "register") {
-            isRegisterDialog = true;
-        }
-        if (infoDat[0] == "dialog_name" && infoDat[1] == "finditem") {
-            ItemDialog = true;
-        }
+					std::string to;
+					string btn = "";
+					bool isRegisterDialog = false;
+					bool ItemDialog = false;
+					string itemname = "";
+					string username = "";
+					string password = "";
+					string passwordverify = "";
+					string email = "";
+					string discord = "";
+					while (std::getline(ss, to, '\n')) {
+					    vector < string > infoDat = explode("|", to);
+					    if (infoDat.size() == 2) {
+						if (infoDat[0] == "buttonClicked") btn = infoDat[1];
+						if (infoDat[0] == "dialog_name" && infoDat[1] == "register") {
+						    isRegisterDialog = true;
+						}
+						if (infoDat[0] == "dialog_name" && infoDat[1] == "finditem") {
+						    ItemDialog = true;
+						}
 
-        if (ItemDialog) {
-            if (infoDat[0] == "itemname") itemname = infoDat[1];
-        }
+						if (ItemDialog) {
+						    if (infoDat[0] == "itemname") itemname = infoDat[1];
+						}
 
-        if (isRegisterDialog) {
-            if (infoDat[0] == "username") username = infoDat[1];
-            if (infoDat[0] == "password") password = infoDat[1];
-            if (infoDat[0] == "passwordverify") passwordverify = infoDat[1];
-            if (infoDat[0] == "email") email = infoDat[1];
-            if (infoDat[0] == "discord") discord = infoDat[1];
-        }
-        if (ItemDialog) {
-            string item = itemname;
-            if (item != "") {
-                if (item.length() >= 3) {
-                    string stuff;
-                    std::ifstream infile("CoreData.txt");
-                    for (std::string line; getline(infile, line);) {
-                        if (line.length() > 8 && line[0] != '/' && line[1] != '/') {
-                            vector < string > ex = explode("|", line);
-                            string nom = ex[1];
-                            string id = ex[0];
-                            std::transform(nom.begin(), nom.end(), nom.begin(), ::tolower);
+						if (isRegisterDialog) {
+						    if (infoDat[0] == "username") username = infoDat[1];
+						    if (infoDat[0] == "password") password = infoDat[1];
+						    if (infoDat[0] == "passwordverify") passwordverify = infoDat[1];
+						    if (infoDat[0] == "email") email = infoDat[1];
+						    if (infoDat[0] == "discord") discord = infoDat[1];
+						}
+						if (ItemDialog) {
+						    string item = itemname;
+						    if (item != "") {
+							if (item.length() >= 3) {
+							    string stuff;
+							    std::ifstream infile("CoreData.txt");
+							    for (std::string line; getline(infile, line);) {
+								if (line.length() > 8 && line[0] != '/' && line[1] != '/') {
+								    vector < string > ex = explode("|", line);
+								    string nom = ex[1];
+								    string id = ex[0];
+								    std::transform(nom.begin(), nom.end(), nom.begin(), ::tolower);
 
-                            std::transform(item.begin(), item.end(), item.begin(), ::tolower);
+								    std::transform(item.begin(), item.end(), item.begin(), ::tolower);
 
-                            if (nom.find(item) != std::string::npos) {
-                                stuff.append("\nadd_button_with_icon|lolfind" + id + "|" + nom + "|left|" + id + "|");
-                            }
-                        }
-                    }
-                    string x = "set_default_color|`3\n";
+								    if (nom.find(item) != std::string::npos) {
+									stuff.append("\nadd_button_with_icon|lolfind" + id + "|" + nom + "|left|" + id + "|");
+								    }
+								}
+							    }
+							    string x = "set_default_color|`3\n";
 
-                    x.append("\nadd_label|big|`9Item Finder|left|");
-                    if (stuff == "") {
-                        GamePacket p = packetEnd(appendString(appendString(createPacket(), "OnConsoleMessage"), "`4[ Item Finding ] `o: No result for " + item + "!"));
-                        ENetPacket * packet = enet_packet_create(p.data,
-                            p.len,
-                            ENET_PACKET_FLAG_RELIABLE);
-                        enet_peer_send(peer, 0, packet);
-                        delete p.data;
-                    } else {
-                        x.append("\nadd_label|small|`wHere are the results of your `9search`w:|left|");
+							    x.append("\nadd_label|big|`9Item Finder|left|");
+							    if (stuff == "") {
+								GamePacket p = packetEnd(appendString(appendString(createPacket(), "OnConsoleMessage"), "`4[ Item Finding ] `o: No result for " + item + "!"));
+								ENetPacket * packet = enet_packet_create(p.data,
+								    p.len,
+								    ENET_PACKET_FLAG_RELIABLE);
+								enet_peer_send(peer, 0, packet);
+								delete p.data;
+							    } else {
+								x.append("\nadd_label|small|`wHere are the results of your `9search`w:|left|");
 
-                        x.append("\nadd_spacer|small|");
+								x.append("\nadd_spacer|small|");
 
-                        x.append(stuff);
+								x.append(stuff);
 
-                        //x.append(addspacer("big"));
-                    }
-                    x.append("\n\nadd_quick_exit|\nnend_dialog|gazette||OK|");
+								//x.append(addspacer("big"));
+							    }
+							    x.append("\n\nadd_quick_exit|\nnend_dialog|gazette||OK|");
 
-                    GamePacket p = packetEnd(appendString(appendString(createPacket(), "OnDialogRequest"), x));
-                    ENetPacket * packet = enet_packet_create(p.data,
-                        p.len,
-                        ENET_PACKET_FLAG_RELIABLE);
-                    enet_peer_send(peer, 0, packet);
-                    delete p.data;
-                } else {
-                    GamePacket p = packetEnd(appendString(appendString(createPacket(), "OnConsoleMessage"), "`4You must enter 3 or more letters!"));
-                    ENetPacket * packet = enet_packet_create(p.data,
-                        p.len,
-                        ENET_PACKET_FLAG_RELIABLE);
-                    enet_peer_send(peer, 0, packet);
-                    delete p.data;
-                }
-            }
-        }
-    }
-}
+							    GamePacket p = packetEnd(appendString(appendString(createPacket(), "OnDialogRequest"), x));
+							    ENetPacket * packet = enet_packet_create(p.data,
+								p.len,
+								ENET_PACKET_FLAG_RELIABLE);
+							    enet_peer_send(peer, 0, packet);
+							    delete p.data;
+							} else {
+							    GamePacket p = packetEnd(appendString(appendString(createPacket(), "OnConsoleMessage"), "`4You must enter 3 or more letters!"));
+							    ENetPacket * packet = enet_packet_create(p.data,
+								p.len,
+								ENET_PACKET_FLAG_RELIABLE);
+							    enet_peer_send(peer, 0, packet);
+							    delete p.data;
+							}
+						    }
+						}
+					    }
+					}
 					if (btn.substr(0, 7) == "lolfind") {
-    					PlayerInventory inventory;
-    					InventoryItem item;
-    					item.itemID = atoi(btn.substr(7, btn.length()).c_str());
-    					item.itemCount = 200;
-    					inventory.items.push_back(item);
-    					item.itemCount = 1;
-    					item.itemID = 18;
-    					inventory.items.push_back(item);
-    					item.itemID = 32;
-    					inventory.items.push_back(item);
-    					sendInventory(peer, inventory);
+						PlayerInventory inventory;
+						InventoryItem item;
+						item.itemID = atoi(btn.substr(7, btn.length()).c_str());
+						item.itemCount = 200;
+						inventory.items.push_back(item);
+						item.itemCount = 1;
+						item.itemID = 18;
+						inventory.items.push_back(item);
+						item.itemID = 32;
+						inventory.items.push_back(item);
+						sendInventory(peer, inventory);
 					}
 					if (btn == "worldPublic") if (((PlayerInfo*)(peer->data))->rawName == getPlyersWorld(peer)->owner) getPlyersWorld(peer)->isPublic = true;
 					if(btn == "worldPrivate") if (((PlayerInfo*)(peer->data))->rawName == getPlyersWorld(peer)->owner) getPlyersWorld(peer)->isPublic = false;
