@@ -1140,7 +1140,24 @@ int getAdminLevel(string username, string password) {
 	}
 	return 0;
 }
+int adminlevel(string name) {
+	std::ifstream ifff("players/" + PlayerDB::getProperName(name) + ".json");
+	json j;
+	ifff >> j;
 
+	int adminlevel;
+	adminlevel = j["adminLevel"];
+
+	ifff.close();
+	if (adminlevel == 0) {
+		return 0;
+	}
+	else {
+		return adminlevel;
+	}
+
+
+}
 bool canSB(string username, string password) {
 	for (int i = 0; i < admins.size(); i++) {
 		Admin admin = admins[i];
