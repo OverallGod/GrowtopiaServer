@@ -1141,22 +1141,33 @@ int getAdminLevel(string username, string password) {
 	return 0;
 }
 int adminlevel(string name) {
-	std::ifstream ifff("players/" + PlayerDB::getProperName(name) + ".json");
-	json j;
-	ifff >> j;
+	bool exist = std::experimental::filesystem::exists("data/players/" + PlayerDB::getProperName(name) + ".json");
 
-	int adminlevel;
-	adminlevel = j["adminLevel"];
+	if (exist)
+	{
 
-	ifff.close();
-	if (adminlevel == 0) {
+		std::ifstream ifff("data/players/" + PlayerDB::getProperName(name) + ".json");
+		json j;
+		ifff >> j;
+
+		int adminlevel;
+		adminlevel = j["adminLevel"];
+
+		ifff.close();
+
+		if (adminlevel == 0 || adminlevel == NULL) {
+			return 0;
+		}
+		else {
+			return adminlevel;
+
+		}
+
+	}
+	else
+	{
 		return 0;
 	}
-	else {
-		return adminlevel;
-	}
-
-
 }
 bool canSB(string username, string password) {
 	for (int i = 0; i < admins.size(); i++) {
