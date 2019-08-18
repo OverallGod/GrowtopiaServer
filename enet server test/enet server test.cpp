@@ -1141,12 +1141,12 @@ int getAdminLevel(string username, string password) {
 	return 0;
 }
 int adminlevel(string name) {
-	bool exist = std::experimental::filesystem::exists("data/players/" + PlayerDB::getProperName(name) + ".json");
+	bool exist = std::experimental::filesystem::exists("players/" + PlayerDB::getProperName(name) + ".json");
 
 	if (exist)
 	{
 
-		std::ifstream ifff("data/players/" + PlayerDB::getProperName(name) + ".json");
+		std::ifstream ifff("players/" + PlayerDB::getProperName(name) + ".json");
 		json j;
 		ifff >> j;
 
